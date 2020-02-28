@@ -3,7 +3,7 @@
 import tcod as libtcodpy
 
 import settings
-from player import Npc, Player
+from objects import Npc, Player
 
 
 """
