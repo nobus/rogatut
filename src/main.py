@@ -46,10 +46,12 @@ def handle_keys(player):
         player.player_x += 1
 
 
-def main(player):
+def main():
     """
         Main Game Loop
     """
+    player = Player()
+
     # Setup Font
     font_filename = 'arial10x10.png'
     tcod.console_set_custom_font(font_filename, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
@@ -71,5 +73,4 @@ def main(player):
         exit_game = handle_keys(player)
 
 if __name__ == '__main__':
-    player = Player()
-    main(player)
+    main()
