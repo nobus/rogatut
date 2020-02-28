@@ -51,7 +51,7 @@ def handle_keys(player):
 def main():
     # Initialization
     libtcodpy.console_set_custom_font('arial10x10.png', libtcodpy.FONT_TYPE_GREYSCALE | libtcodpy.FONT_LAYOUT_TCOD)
-    libtcodpy.console_init_root(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, 'python/libtcod tutorial', False)
+    libtcodpy.console_init_root(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, 'ROGuelike TUTorial', False)
     libtcodpy.sys_set_fps(settings.LIMIT_FPS)
     con = libtcodpy.console_new(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
 
@@ -59,17 +59,6 @@ def main():
     player = Player(con, settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2, '@', libtcodpy.white)
     npc = Npc(con, settings.SCREEN_WIDTH // 2 - 5, settings.SCREEN_HEIGHT // 2, '@', libtcodpy.yellow)
     objects = [npc, player]
-
-    # Setup Font
-    font_filename = 'arial10x10.png'
-    libtcodpy.console_set_custom_font(font_filename, libtcodpy.FONT_TYPE_GREYSCALE | libtcodpy.FONT_LAYOUT_TCOD)
-
-    # Initialize screen
-    title = 'ROGuelike TUTorial'
-    libtcodpy.console_init_root(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, title, settings.FULLSCREEN)
-
-    # Set FPS
-    libtcodpy.sys_set_fps(settings.LIMIT_FPS)
 
     # Main loop
     while not libtcodpy.console_is_window_closed():
