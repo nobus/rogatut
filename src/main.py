@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import libtcodpy as tcod
+#import libtcodpy as tcod
+import tcod as libtcodpy
 
 import settings
-from player import Player
+from player import Npc, Player
 
 
 """
@@ -15,62 +16,80 @@ def get_key_event(turn_based=None):
     """
     if turn_based:
         # Turn-based game play; wait for a key stroke
-        key = tcod.console_wait_for_keypress(True)
+        key = libtcodpy.console_wait_for_keypress(True)
     else:
         # Real-time game play; don't wait for a player's key stroke
-        key = tcod.console_check_for_keypress()
+        key = libtcodpy.console_check_for_keypress()
     return key
 
 
 def handle_keys(player):
-    key = get_key_event(settings.TURN_BASED)
+    #key = libtcod.console_check_for_keypress()  #real-time
+    key = libtcodpy.console_wait_for_keypress(True)  #turn-based
 
-    if key.vk == tcod.KEY_ENTER and key.lalt:
-        # Alt+Enter: toggle fullscreen
-        tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
+    if key.vk == libtcodpy.KEY_ENTER and key.lalt:
+        #Alt+Enter: toggle fullscreen
+        libtcodpy.console_set_fullscreen(not libtcodpy.console_is_fullscreen())
 
-    elif key.vk == tcod.KEY_ESCAPE:
-        return True  # exit game
+    elif key.vk == libtcodpy.KEY_ESCAPE:
+        return True  #exit game
 
-    # movement keys
-    if tcod.console_is_key_pressed(tcod.KEY_UP):
-        player.player_y -= 1
+    #movement keys
+    if libtcodpy.console_is_key_pressed(libtcodpy.KEY_UP):
+        player.move(0, -1)
 
-    elif tcod.console_is_key_pressed(tcod.KEY_DOWN):
-        player.player_y += 1
+    elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_DOWN):
+        player.move(0, 1)
 
-    elif tcod.console_is_key_pressed(tcod.KEY_LEFT):
-        player.player_x -= 1
+    elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_LEFT):
+        player.move(-1, 0)
 
-    elif tcod.console_is_key_pressed(tcod.KEY_RIGHT):
-        player.player_x += 1
+    elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_RIGHT):
+        player.move(1, 0)
 
 
 def main():
-    """
-        Main Game Loop
-    """
-    player = Player()
+    # Initialization
+    libtcodpy.console_set_custom_font('arial10x10.png', libtcodpy.FONT_TYPE_GREYSCALE | libtcodpy.FONT_LAYOUT_TCOD)
+    libtcodpy.console_init_root(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, 'python/libtcod tutorial', False)
+    libtcodpy.sys_set_fps(settings.LIMIT_FPS)
+    con = libtcodpy.console_new(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
+
+    # game objects
+    player = Player(con, settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2, '@', libtcodpy.white)
+    npc = Npc(con, settings.SCREEN_WIDTH // 2 - 5, settings.SCREEN_HEIGHT // 2, '@', libtcodpy.yellow)
+    objects = [npc, player]
 
     # Setup Font
     font_filename = 'arial10x10.png'
-    tcod.console_set_custom_font(font_filename, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
+    libtcodpy.console_set_custom_font(font_filename, libtcodpy.FONT_TYPE_GREYSCALE | libtcodpy.FONT_LAYOUT_TCOD)
 
     # Initialize screen
     title = 'ROGuelike TUTorial'
-    tcod.console_init_root(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, title, settings.FULLSCREEN)
+    libtcodpy.console_init_root(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, title, settings.FULLSCREEN)
 
     # Set FPS
-    tcod.sys_set_fps(settings.LIMIT_FPS)
+    libtcodpy.sys_set_fps(settings.LIMIT_FPS)
 
-    exit_game = False
-    while not tcod.console_is_window_closed() and not exit_game:
-        tcod.console_set_default_foreground(0, tcod.white)
-        tcod.console_put_char(0, player.player_x, player.player_y, '@', tcod.BKGND_NONE)
-        tcod.console_flush()
-        tcod.console_put_char(0, player.player_x, player.player_y, ' ', tcod.BKGND_NONE)
+    # Main loop
+    while not libtcodpy.console_is_window_closed():
+        #draw all objects in the list
+        for object in objects:
+            object.draw()
 
-        exit_game = handle_keys(player)
+        #blit the contents of "con" to the root console and present it
+        libtcodpy.console_blit(con, 0, 0, settings. SCREEN_WIDTH, settings.SCREEN_HEIGHT, 0, 0, 0)
+        libtcodpy.console_flush()
+
+        #erase all objects at their old locations, before they move
+        for object in objects:
+            object.clear()
+
+        #handle keys and exit game if needed
+        exit = handle_keys(player)
+        if exit:
+            break
+
 
 if __name__ == '__main__':
     main()
