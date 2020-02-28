@@ -1,7 +1,6 @@
-import tcod as libtcodpy
-
-import settings
 from abc import ABCMeta, abstractmethod, abstractproperty
+
+import tcod as libtcodpy
 
 
 class CommonObject(metaclass=ABCMeta):
@@ -39,3 +38,12 @@ class Npc(CommonObject, MovingObject):
 
 class Player(Npc):
     pass
+
+class Tile:
+    #a tile of the map and its properties
+    def __init__(self, blocked, block_sight = None):
+        self.blocked = blocked
+
+        #by default, if a tile is blocked, it also blocks sight
+        if block_sight is None: block_sight = blocked
+        self.block_sight = block_sight
