@@ -7,7 +7,7 @@ import tcod as libtcodpy
 class CommonObject(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, con, x, y, char, color=None):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def draw(self):
