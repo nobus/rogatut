@@ -1,5 +1,5 @@
 from random import randint
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 import tcod as libtcodpy
 
