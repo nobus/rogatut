@@ -4,6 +4,8 @@
 # instalation:
 ## libdsl2-dev
 ```
+sudo apt update
+sudo apt install aptitude
 sudo aptitude install libsdl2-dev
      Keep the following packages at their current version:
 1)     libpulse-dev [Not Installed]                       
