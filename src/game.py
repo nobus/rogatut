@@ -43,8 +43,8 @@ class Game:
                     libtcodpy.console_set_char_background(self.con, x, y, settings.COLOR_DARK_GROUND, libtcodpy.BKGND_SET)
     
         #draw all objects in the list
-        for object in self.objects:
-            object.draw()
+        for obj in self.objects:
+            obj.draw()
     
         #blit the contents of "con" to the root console
         libtcodpy.console_blit(self.con, 0, 0, settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, 0, 0, 0)
