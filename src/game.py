@@ -16,8 +16,8 @@ class Game:
         self.game_map = GameMap(self.con)
 
         # game objects
-        self.player = Player(self.con, settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2, '@', libtcodpy.white)
-        self.npc = Npc(self.con, settings.SCREEN_WIDTH // 2 - 5, settings.SCREEN_HEIGHT // 2, '@', libtcodpy.yellow)
+        self.player = Player(self.con, settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2, '@')
+        self.npc = Npc(self.con, settings.SCREEN_WIDTH // 2 - 5, settings.SCREEN_HEIGHT // 2, '@')
         self.objects = [self.npc, self.player]
 
     def render_all(self):
