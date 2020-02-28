@@ -1,3 +1,4 @@
+from random import randint
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 import tcod as libtcodpy
@@ -24,7 +25,12 @@ class MovingObject(metaclass=ABCMeta):
     def move(self, dx, dy):
         raise NotImplementedError
 
-class Npc(CommonObject, MovingObject):
+class SelfMovingObject(metaclass=ABCMeta):
+    @abstractmethod
+    def move(self):
+        raise NotImplementedError
+
+class Creature(CommonObject):
     def draw(self):
         libtcodpy.console_set_default_foreground(self.con, self.color)
         libtcodpy.console_put_char(self.con, self.x, self.y, self.char, libtcodpy.BKGND_NONE)
@@ -32,12 +38,15 @@ class Npc(CommonObject, MovingObject):
     def clear(self):
         libtcodpy.console_put_char(self.con, self.x, self.y, ' ', libtcodpy.BKGND_NONE)
 
+class Npc(Creature, SelfMovingObject):
+    def move(self):
+        self.x += randint(-1, 1)
+        self.y += randint(-1, 1)
+
+class Player(Creature, MovingObject):
     def move(self, dx, dy):
         self.x += dx
         self.y += dy
-
-class Player(Npc):
-    pass
 
 class Tile:
     #a tile of the map and its properties

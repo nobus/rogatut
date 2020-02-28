@@ -1,5 +1,3 @@
-from random import randint
-
 import tcod as libtcodpy
 
 import settings
@@ -58,7 +56,7 @@ class Game:
 
     def move_npc(self):
         # move npc
-        self.npc.move(randint(-1, 1), randint(-1, 1))
+        self.npc.move()
 
     def handle_keys(self):
         #key = libtcod.console_check_for_keypress()  #real-time
