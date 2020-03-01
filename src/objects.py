@@ -24,8 +24,7 @@ class MovingObject(metaclass=ABCMeta):
         raise NotImplementedError
 
 class SelfMovingObject(metaclass=ABCMeta):
-    def __repr__(self):
-        return 'selfmoving'
+    is_selfmoving = True
 
     @abstractmethod
     def move(self, path_blocked):

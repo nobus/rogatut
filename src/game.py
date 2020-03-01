@@ -26,7 +26,7 @@ class Game:
         for monster in self.game_map.place_monsters():
             self.objects.append(monster)
 
-            if monster.__repr__() == 'selfmoving':
+            if hasattr(monster, 'is_selfmoving') and monster.is_selfmoving:
                 self.npcs.append(monster)
 
     def is_blocked(self, x, y):
