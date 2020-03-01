@@ -48,7 +48,7 @@ class Creature(CommonObject):
         libtcodpy.console_put_char(self.con, self.x, self.y, ' ', libtcodpy.BKGND_NONE)
 
 class Npc(Creature, SelfMovingObject):
-    def __init__(self, con, x, y, char, color=None, blocks=False):
+    def __init__(self, con, x, y, char):
         super(Npc, self).__init__(con, x, y, char)
         self.color = libtcodpy.yellow
         self._next_step = 10
@@ -70,7 +70,7 @@ class Npc(Creature, SelfMovingObject):
                 self.y = y
 
 class Orc(Creature, SelfMovingObject):
-    def __init__(self, con, x, y, char, color=None, blocks=True):
+    def __init__(self, con, x, y, char):
         super(Orc, self).__init__(con, x, y, char)
         self.color = libtcodpy.desaturated_green
 
@@ -86,15 +86,16 @@ class Orc(Creature, SelfMovingObject):
             self.y = y
 
 class Troll(Creature):
-    def __init__(self, con, x, y, char, color=None, blocks=True):
+    def __init__(self, con, x, y, char):
         super(Troll, self).__init__(con, x, y, char)
         self.color = libtcodpy.darker_green
+        self.blocks = True
 
     def __str__(self):
         return '...Me Troll... |-!'
 
 class Player(Creature, MovingObject):
-    def __init__(self, con, x, y, char, color=None, blocks=False):
+    def __init__(self, con, x, y, char):
         super(Player, self).__init__(con, x, y, char)
         self.color = libtcodpy.white
 
