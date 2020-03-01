@@ -21,7 +21,7 @@ class Game:
         self.objects = [self.npc, self.player]
 
     def render_all(self):
-        self.game_map.render()
+        self.game_map.render(self.player.x, self.player.y)
     
         #draw all objects in the list
         for obj in self.objects:
@@ -52,15 +52,19 @@ class Game:
 
         #movement keys
         if libtcodpy.console_is_key_pressed(libtcodpy.KEY_UP):
+            self.game_map.fov_recompute = True
             self.player.move(0, -1)
 
         elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_DOWN):
+            self.game_map.fov_recompute = True
             self.player.move(0, 1)
 
         elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_LEFT):
+            self.game_map.fov_recompute = True
             self.player.move(-1, 0)
 
         elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_RIGHT):
+            self.game_map.fov_recompute = True
             self.player.move(1, 0)
 
     def run(self):
