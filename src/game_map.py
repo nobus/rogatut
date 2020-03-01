@@ -159,6 +159,9 @@ class GameMap():
     def get_staring_position(self):
         return self.get_center_of_room(0)
 
+    def get_ending_position(self):
+        return self.get_center_of_room(len(self._rooms)-1)
+
     def render(self, player_x, player_y):
         if self.fov_recompute:
             #recompute FOV if needed (the player moved or something)

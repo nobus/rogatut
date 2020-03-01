@@ -17,7 +17,9 @@ class Game:
         player_x, player_y = self.game_map.get_staring_position()
         # game objects
         self.player = Player(self.con, player_x, player_y, '@')
-        self.npc = Npc(self.con, settings.SCREEN_WIDTH // 2 - 5, settings.SCREEN_HEIGHT // 2, '@')
+
+        npc_x, npc_y = self.game_map.get_ending_position()
+        self.npc = Npc(self.con, npc_x, npc_y, '@')
         self.objects = [self.npc, self.player]
 
         self.npcs = [self.npc]
