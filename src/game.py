@@ -14,9 +14,9 @@ class Game:
         self.con = libtcodpy.console_new(settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
 
         self.game_map = GameMap(self.con)
-
+        player_x, player_y = self.game_map.get_staring_position()
         # game objects
-        self.player = Player(self.con, settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2, '@')
+        self.player = Player(self.con, player_x, player_y, '@')
         self.npc = Npc(self.con, settings.SCREEN_WIDTH // 2 - 5, settings.SCREEN_HEIGHT // 2, '@')
         self.objects = [self.npc, self.player]
 
