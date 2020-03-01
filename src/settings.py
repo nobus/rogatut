@@ -1,8 +1,9 @@
 import tcod as libtcodpy
 
-# ######################################################################
-# Global Game Settings
-# ######################################################################
+"""
+ Global Game Settings
+"""
+
 # Windows Controls
 FULLSCREEN = False
 SCREEN_WIDTH = 80  # characters wide
@@ -16,3 +17,7 @@ COLOR_DARK_GROUND = libtcodpy.Color(50, 50, 150)
 
 MAP_WIDTH = 80
 MAP_HEIGHT = 45
+
+ROOM_MAX_SIZE = 10
+ROOM_MIN_SIZE = 6
+MAX_ROOMS = 30
