@@ -43,8 +43,6 @@ class GameMap():
         self._game_map = []
         self._fov_map = []
         self._rooms = []
-        self._start_x = None
-        self._start_y = None
 
         self._make_map()
         self._make_fow_map()
@@ -73,8 +71,6 @@ class GameMap():
             [Tile(True) for y in range(settings.MAP_HEIGHT)]
             for x in range(settings.MAP_WIDTH) 
         ]
-
-        num_rooms = 0
     
         for r in range(settings.MAX_ROOMS):
             #random width and height
@@ -101,16 +97,12 @@ class GameMap():
                 #center coordinates of new room, will be useful later
                 (new_x, new_y) = new_room.center()
 
-                if num_rooms == 0:
-                    #this is the first room, where the player starts at
-                    self._start_x = new_x
-                    self._start_y = new_y
-                else:
+                if len(self._rooms) > 0:
                     #all rooms after the first:
                     #connect it to the previous room with a tunnel
 
                     #center coordinates of previous room
-                    (prev_x, prev_y) = self._rooms[num_rooms-1].center()
+                    (prev_x, prev_y) = self._rooms[-1].center()
 
                     #draw a coin (random number that is either 0 or 1)
                     if libtcodpy.random_get_int(0, 0, 1) == 1:
@@ -124,7 +116,6 @@ class GameMap():
 
                 #finally, append the new room to the list
                 self._rooms.append(new_room)
-                num_rooms += 1
 
     def _make_fow_map(self):
         #create the FOV map, according to the generated map
@@ -153,10 +144,20 @@ class GameMap():
                 yield monster
     
     def is_blocked(self, x, y):
-        return self._game_map[x][y].blocked
+        #check out of range
+        if len(self._game_map) > x and len(self._game_map[x]) > y:
+            return self._game_map[x][y].blocked
+
+        #if x or y are outing of range
+        return True
+
+    def get_center_of_room(self, n):
+        #get center coordinates of the room
+        if len(self._rooms) > n:
+            return self._rooms[n].center()
 
     def get_staring_position(self):
-        return self._start_x, self._start_y
+        return self.get_center_of_room(0)
 
     def render(self, player_x, player_y):
         if self.fov_recompute:
