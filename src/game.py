@@ -20,6 +20,25 @@ class Game:
         self.npc = Npc(self.con, settings.SCREEN_WIDTH // 2 - 5, settings.SCREEN_HEIGHT // 2, '@')
         self.objects = [self.npc, self.player]
 
+        self.npcs = [self.npc]
+        for monster in self.game_map.place_monsters():
+            self.objects.append(monster)
+
+            if monster.__repr__() == 'selfmoving':
+                self.npcs.append(monster)
+
+    def is_blocked(self, x, y):
+        #first test the map tile
+        if self.game_map.is_blocked(x, y):
+            return True
+
+        #now check for any blocking objects
+        for obj in self.objects:
+            if obj.blocks and obj.x == x and obj.y == y:
+                return True
+
+        return False
+
     def render_all(self):
         self.game_map.render(self.player.x, self.player.y)
     
@@ -35,9 +54,10 @@ class Game:
         for obj in self.objects:
             obj.clear()
 
-    def move_npc(self):
+    def move_npcs(self):
         # move npc
-        self.npc.move()
+        for npc in self.npcs:
+            npc.move(self.is_blocked)
 
     def handle_keys(self):
         #key = libtcod.console_check_for_keypress()  #real-time
@@ -53,19 +73,19 @@ class Game:
         #movement keys
         if libtcodpy.console_is_key_pressed(libtcodpy.KEY_UP):
             self.game_map.fov_recompute = True
-            self.player.move(0, -1)
+            self.player.move(0, -1, self.is_blocked)
 
         elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_DOWN):
             self.game_map.fov_recompute = True
-            self.player.move(0, 1)
+            self.player.move(0, 1, self.is_blocked)
 
         elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_LEFT):
             self.game_map.fov_recompute = True
-            self.player.move(-1, 0)
+            self.player.move(-1, 0, self.is_blocked)
 
         elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_RIGHT):
             self.game_map.fov_recompute = True
-            self.player.move(1, 0)
+            self.player.move(1, 0, self.is_blocked)
 
     def run(self):
         # Main loop
@@ -74,7 +94,7 @@ class Game:
             libtcodpy.console_flush()
 
             self.clear_objects()
-            self.move_npc()
+            self.move_npcs()
 
             #handle keys and exit game if needed
             exit = self.handle_keys()

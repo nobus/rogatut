@@ -1,6 +1,7 @@
 import tcod as libtcodpy
-import settings
 
+import settings
+from objects import Troll, Orc
 
 class Tile:
     #a tile of the map and its properties
@@ -16,8 +17,8 @@ class Tile:
 
         self.block_sight = block_sight
 
-class Rect:
-    #a rectangle on the map. used to characterize a room.
+class Room:
+    #a rectangle room on the map. used to characterize a room.
     def __init__(self, x, y, w, h):
         self.x1 = x
         self.y1 = y
@@ -41,6 +42,7 @@ class GameMap():
 
         self._game_map = []
         self._fov_map = []
+        self._rooms = []
         self._start_x = None
         self._start_y = None
 
@@ -72,7 +74,6 @@ class GameMap():
             for x in range(settings.MAP_WIDTH) 
         ]
 
-        rooms = []
         num_rooms = 0
     
         for r in range(settings.MAX_ROOMS):
@@ -83,11 +84,11 @@ class GameMap():
             x = libtcodpy.random_get_int(0, 0, settings.MAP_WIDTH - w - 1)
             y = libtcodpy.random_get_int(0, 0, settings.MAP_HEIGHT - h - 1)
 
-            new_room = Rect(x, y, w, h)
+            new_room = Room(x, y, w, h)
 
             #run through the other rooms and see if they intersect with this one
             failed = False
-            for other_room in rooms:
+            for other_room in self._rooms:
                 if new_room.intersect(other_room):
                     failed = True
                     break
@@ -109,7 +110,7 @@ class GameMap():
                     #connect it to the previous room with a tunnel
 
                     #center coordinates of previous room
-                    (prev_x, prev_y) = rooms[num_rooms-1].center()
+                    (prev_x, prev_y) = self._rooms[num_rooms-1].center()
 
                     #draw a coin (random number that is either 0 or 1)
                     if libtcodpy.random_get_int(0, 0, 1) == 1:
@@ -122,7 +123,7 @@ class GameMap():
                         self._create_h_tunnel(prev_x, new_x, new_y)
 
                 #finally, append the new room to the list
-                rooms.append(new_room)
+                self._rooms.append(new_room)
                 num_rooms += 1
 
     def _make_fow_map(self):
@@ -131,6 +132,28 @@ class GameMap():
         for y in range(settings.MAP_HEIGHT):
             for x in range(settings.MAP_WIDTH):
                 libtcodpy.map_set_properties(self._fov_map, x, y, not self._game_map[x][y].block_sight, not self._game_map[x][y].blocked)
+
+    def place_monsters(self):
+        for room in self._rooms:
+            #choose random number of monsters
+            num_monsters = libtcodpy.random_get_int(0, 0, settings.MAX_ROOM_MONSTERS)
+        
+            for i in range(num_monsters):
+                #choose random spot for this monster
+                x = libtcodpy.random_get_int(0, room.x1, room.x2)
+                y = libtcodpy.random_get_int(0, room.y1, room.y2)
+        
+                if libtcodpy.random_get_int(0, 0, 100) < 80:  #80% chance of getting an orc
+                    #create an orc
+                    monster = Orc(self.con, x, y, 'o')
+                else:
+                    #create a troll
+                    monster = Troll(self.con, x, y, 'T')
+        
+                yield monster
+    
+    def is_blocked(self, x, y):
+        return self._game_map[x][y].blocked
 
     def get_staring_position(self):
         return self._start_x, self._start_y
