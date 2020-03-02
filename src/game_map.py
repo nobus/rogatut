@@ -1,7 +1,7 @@
 import tcod as libtcodpy
 
 import settings
-from objects import Troll, Orc
+from objects import Troll, Orc, Fighter, SelfMovingBasicMonster, ImmovableBasicMonster
 
 class Tile:
     #a tile of the map and its properties
@@ -124,6 +124,9 @@ class GameMap():
             for x in range(settings.MAP_WIDTH):
                 libtcodpy.map_set_properties(self._fov_map, x, y, not self._game_map[x][y].block_sight, not self._game_map[x][y].blocked)
 
+    def map_is_in_fov(self, x, y):
+        return libtcodpy.map_is_in_fov(self._fov_map, x, y)
+
     def place_monsters(self):
         for room in self._rooms:
             #choose random number of monsters
@@ -136,10 +139,20 @@ class GameMap():
         
                 if libtcodpy.random_get_int(0, 0, 100) < 80:  #80% chance of getting an orc
                     #create an orc
-                    monster = Orc('Uguk', self.con, x, y, 'o')
+                    monster = Orc(
+                        'Uguk',
+                        self.con,
+                        x, y, 'o',
+                        Fighter(hp=10, defense=0, power=3),
+                        SelfMovingBasicMonster())
                 else:
                     #create a troll
-                    monster = Troll('Ogg', self.con, x, y, 'T')
+                    monster = Troll(
+                        'Ogg',
+                        self.con,
+                        x, y, 'T',
+                        Fighter(hp=20, defense=5, power=7),
+                        ImmovableBasicMonster())
         
                 yield monster
     

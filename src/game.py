@@ -4,7 +4,7 @@ import tcod as libtcodpy
 
 import settings
 from game_map import GameMap
-from objects import Player, Npc
+from objects import Player, Npc, Fighter
 
 
 class Game:
@@ -18,7 +18,7 @@ class Game:
         self.game_map = GameMap(self.con)
         player_x, player_y = self.game_map.get_staring_position()
         # game objects
-        self.player = Player('Player', self.con, player_x, player_y, '@')
+        self.player = Player('Player', self.con, player_x, player_y, '@', fighter=Fighter(hp=15, defense=5, power=5))
 
         npc_x, npc_y = self.game_map.get_ending_position()
         self.npc = Npc('Trader', self.con, npc_x, npc_y, '@')
@@ -77,8 +77,8 @@ class Game:
         #let monsters take their turn
         if self.game_state == 'playing' and self.player_action != 'didnt-take-turn':
             for obj in self.objects:
-                if obj != self.player:
-                    print(f'{time.time()} The {obj.name} growls!')
+                if obj.ai:
+                    obj.ai.take_turn(self.game_map, self.player)
 
         if self.game_state == 'playing':
             if key.vk == libtcodpy.KEY_ENTER and key.lalt:
