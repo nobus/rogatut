@@ -1,7 +1,7 @@
 # rogatut the training project
 [tutorial](http://www.roguebasin.com/index.php?title=Complete_Roguelike_Tutorial,_using_python3%2Blibtcod)
 
-# instalation:
+# instalation (Ubuntu 18.04.4 LTS):
 ## libdsl2-dev
 ```
 sudo apt update
