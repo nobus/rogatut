@@ -1,3 +1,5 @@
+import time
+
 import tcod as libtcodpy
 
 import settings
@@ -16,10 +18,10 @@ class Game:
         self.game_map = GameMap(self.con)
         player_x, player_y = self.game_map.get_staring_position()
         # game objects
-        self.player = Player(self.con, player_x, player_y, '@')
+        self.player = Player('Player', self.con, player_x, player_y, '@')
 
         npc_x, npc_y = self.game_map.get_ending_position()
-        self.npc = Npc(self.con, npc_x, npc_y, '@')
+        self.npc = Npc('Trader', self.con, npc_x, npc_y, '@')
         self.objects = [self.npc, self.player]
 
         self.npcs = [self.npc]
@@ -29,17 +31,24 @@ class Game:
             if hasattr(monster, 'is_selfmoving') and monster.is_selfmoving:
                 self.npcs.append(monster)
 
-    def is_blocked(self, x, y):
+        self.game_state = 'playing'
+        self.player_action = None
+
+    def is_blocked_and_target(self, x, y):
         #first test the map tile
         if self.game_map.is_blocked(x, y):
-            return True
+            return (True, None)
 
         #now check for any blocking objects
         for obj in self.objects:
-            if obj.blocks and obj.x == x and obj.y == y:
-                return True
+            if obj.x == x and obj.y == y:
+                return (obj.blocks, obj)
 
-        return False
+        return (False, None)
+
+    def is_blocked(self, x, y):
+        _is_blocked, _ = self.is_blocked_and_target(x, y)
+        return _is_blocked
 
     def render_all(self):
         self.game_map.render(self.player.x, self.player.y)
@@ -65,29 +74,35 @@ class Game:
         #key = libtcod.console_check_for_keypress()  #real-time
         key = libtcodpy.console_wait_for_keypress(True)  #turn-based
 
-        if key.vk == libtcodpy.KEY_ENTER and key.lalt:
-            #Alt+Enter: toggle fullscreen
-            libtcodpy.console_set_fullscreen(not libtcodpy.console_is_fullscreen())
+        #let monsters take their turn
+        if self.game_state == 'playing' and self.player_action != 'didnt-take-turn':
+            for obj in self.objects:
+                if obj != self.player:
+                    print(f'{time.time()} The {obj.name} growls!')
 
-        elif key.vk == libtcodpy.KEY_ESCAPE:
-            return True  #exit game
+        if self.game_state == 'playing':
+            if key.vk == libtcodpy.KEY_ENTER and key.lalt:
+                #Alt+Enter: toggle fullscreen
+                libtcodpy.console_set_fullscreen(not libtcodpy.console_is_fullscreen())
 
-        #movement keys
-        if libtcodpy.console_is_key_pressed(libtcodpy.KEY_UP):
-            self.game_map.fov_recompute = True
-            self.player.move(0, -1, self.is_blocked)
+            elif key.vk == libtcodpy.KEY_ESCAPE:
+                return 'exit'  #exit game
 
-        elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_DOWN):
-            self.game_map.fov_recompute = True
-            self.player.move(0, 1, self.is_blocked)
+            #movement keys
+            if libtcodpy.console_is_key_pressed(libtcodpy.KEY_UP):
+                self.game_map.fov_recompute = self.player.move(0, -1, self.is_blocked_and_target)
 
-        elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_LEFT):
-            self.game_map.fov_recompute = True
-            self.player.move(-1, 0, self.is_blocked)
+            elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_DOWN):
+                self.game_map.fov_recompute = self.player.move(0, 1, self.is_blocked_and_target)
 
-        elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_RIGHT):
-            self.game_map.fov_recompute = True
-            self.player.move(1, 0, self.is_blocked)
+            elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_LEFT):
+                self.game_map.fov_recompute = self.player.move(-1, 0, self.is_blocked_and_target)
+
+            elif libtcodpy.console_is_key_pressed(libtcodpy.KEY_RIGHT):
+                self.game_map.fov_recompute = self.player.move(1, 0, self.is_blocked_and_target)
+
+            else:
+                return 'didnt-take-turn'
 
     def run(self):
         # Main loop
@@ -99,6 +114,6 @@ class Game:
             self.move_npcs()
 
             #handle keys and exit game if needed
-            exit = self.handle_keys()
-            if exit:
+            self.player_action = self.handle_keys()
+            if self.player_action == 'exit':
                 break

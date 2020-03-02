@@ -136,10 +136,10 @@ class GameMap():
         
                 if libtcodpy.random_get_int(0, 0, 100) < 80:  #80% chance of getting an orc
                     #create an orc
-                    monster = Orc(self.con, x, y, 'o')
+                    monster = Orc('Uguk', self.con, x, y, 'o')
                 else:
                     #create a troll
-                    monster = Troll(self.con, x, y, 'T')
+                    monster = Troll('Ogg', self.con, x, y, 'T')
         
                 yield monster
     
