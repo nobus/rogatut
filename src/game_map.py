@@ -143,16 +143,16 @@ class GameMap():
                         'Uguk',
                         self.con,
                         x, y, 'o',
-                        Fighter(hp=10, defense=0, power=3),
-                        SelfMovingBasicMonster())
+                        fighter=Fighter(hp=10, defense=0, power=3),
+                        ai=SelfMovingBasicMonster())
                 else:
                     #create a troll
                     monster = Troll(
                         'Ogg',
                         self.con,
                         x, y, 'T',
-                        Fighter(hp=20, defense=5, power=7),
-                        ImmovableBasicMonster())
+                        fighter=Fighter(hp=20, defense=5, power=7),
+                        ai=ImmovableBasicMonster())
         
                 yield monster
     

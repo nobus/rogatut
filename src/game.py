@@ -60,6 +60,17 @@ class Game:
         #blit the contents of "con" to the root console
         libtcodpy.console_blit(self.con, 0, 0, settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, 0, 0, 0)
 
+        #show the player's stats
+        libtcodpy.console_set_default_foreground(self.con, libtcodpy.white)
+        libtcodpy.console_print_ex(
+            self.con,
+            1,
+            settings.SCREEN_HEIGHT - 2,
+            libtcodpy.BKGND_NONE,
+            libtcodpy.LEFT,
+            f'HP: {str(self.player.fighter.hp)} / {str(self.player.fighter.max_hp)}'
+        )
+
     def clear_objects(self):
         #erase all objects at their old locations, before they move
         for obj in self.objects:

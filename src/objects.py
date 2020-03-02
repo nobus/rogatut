@@ -53,6 +53,22 @@ class Fighter:
         self.defense = defense
         self.power = power
 
+    def take_damage(self, damage):
+        #apply damage if possible
+        if damage > 0:
+            self.hp -= damage
+
+    def attack(self, target):
+        #a simple formula for attack damage
+        damage = self.power - target.fighter.defense
+
+        if damage > 0:
+            #make the target take some damage
+            print(f'{self.owner.name.capitalize()} attacks {target.name} for {str(damage)} hit points.')
+            target.fighter.take_damage(damage)
+        else:
+            print(f'{self.owner.name.capitalize()} attacks {target.name} but it has no effect!')
+
 class SelfMovingBasicMonster(BasicAI):
     #AI for a self-moving basic monster.
 
@@ -68,7 +84,7 @@ class SelfMovingBasicMonster(BasicAI):
 
             #close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
-                print(f'The attack of the {monster.name} bounces off your shiny metal armor!')
+                monster.fighter.attack(player)
 
 class ImmovableBasicMonster(BasicAI):
     def take_turn(self, game_map, player):
@@ -77,7 +93,7 @@ class ImmovableBasicMonster(BasicAI):
             print(f'The {self.owner.name} growls!')
 
         if player.fighter.hp > 0 and  monster.distance_to(player) == 0:
-            print(f'The attack of the {monster.name} bounces off your shiny metal armor!')
+            monster.fighter.attack(player)
 
 class Creature(CommonObject):
     def __init__(self, name, con, x, y, char, color=None, blocks=False, fighter=None, ai=None):
@@ -194,7 +210,8 @@ class Player(Creature, MovingObject):
         
         #attack if target found, move otherwise
         if obj is not None and obj.target:
-            print(f'The monster {obj.name} laughs at your puny efforts to attack him!')
+            #print(f'The monster {obj.name} laughs at your puny efforts to attack him!')
+            self.fighter.attack(obj)
         elif not is_blocked:
             self.x += dx
             self.y += dy
