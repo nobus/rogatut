@@ -4,7 +4,7 @@ import tcod as libtcodpy
 
 import settings
 from game_map import GameMap
-from objects import Player, Npc, Fighter
+from objects import Player, Npc, Fighter, player_death
 
 
 class Game:
@@ -18,7 +18,11 @@ class Game:
         self.game_map = GameMap(self.con)
         player_x, player_y = self.game_map.get_staring_position()
         # game objects
-        self.player = Player('Player', self.con, player_x, player_y, '@', fighter=Fighter(hp=15, defense=5, power=5))
+        self.player = Player(
+            'Player',
+            self.con,
+            player_x, player_y, '@',
+            fighter=Fighter(hp=15, defense=5, power=5, death_function=player_death))
 
         npc_x, npc_y = self.game_map.get_ending_position()
         self.npc = Npc('Trader', self.con, npc_x, npc_y, '@')

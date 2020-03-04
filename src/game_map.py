@@ -1,7 +1,7 @@
 import tcod as libtcodpy
 
 import settings
-from objects import Troll, Orc, Fighter, SelfMovingBasicMonster, ImmovableBasicMonster
+from objects import Troll, Orc, Fighter, SelfMovingBasicMonster, ImmovableBasicMonster, monster_death
 
 class Tile:
     #a tile of the map and its properties
@@ -143,7 +143,7 @@ class GameMap():
                         'Uguk',
                         self.con,
                         x, y, 'o',
-                        fighter=Fighter(hp=10, defense=0, power=3),
+                        fighter=Fighter(hp=10, defense=0, power=3, death_function=monster_death),
                         ai=SelfMovingBasicMonster())
                 else:
                     #create a troll
@@ -151,7 +151,7 @@ class GameMap():
                         'Ogg',
                         self.con,
                         x, y, 'T',
-                        fighter=Fighter(hp=20, defense=5, power=7),
+                        fighter=Fighter(hp=20, defense=5, power=7, death_function=monster_death),
                         ai=ImmovableBasicMonster())
         
                 yield monster

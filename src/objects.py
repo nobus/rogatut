@@ -45,29 +45,57 @@ class BasicAI(metaclass=ABCMeta):
         raise NotImplementedError
 
 ### Implementation ###
+def player_death(player):
+    #the game ended!
+    print(f'You died!')
+
+    #for added effect, transform the player into a corpse!
+    player.char = '%'
+    player.color = libtcodpy.dark_red
+    player.is_alive = False
+
+def monster_death(monster):
+    #transform it into a nasty corpse! it doesn't block, can't be
+    #attacked and doesn't move
+    print(f'{monster.name.capitalize()} is dead!')
+    monster.char = '%'
+    monster.color = libtcodpy.dark_red
+    monster.blocks = False
+    monster.fighter = None
+    monster.ai = None
+    monster.name = f'remains of {monster.name}'
+    monster.is_alive = False
+
 class Fighter:
     #combat-related properties and methods (monster, player, NPC).
-    def __init__(self, hp, defense, power):
+    def __init__(self, hp, defense, power, death_function=None):
         self.max_hp = hp
         self.hp = hp
         self.defense = defense
         self.power = power
+        self.death_function = death_function
 
     def take_damage(self, damage):
+        #check for death. if there's a death function, call it
+        if self.hp <= 0:
+            if self.death_function is not None:
+                self.death_function(self.owner)
+
         #apply damage if possible
         if damage > 0:
             self.hp -= damage
 
     def attack(self, target):
-        #a simple formula for attack damage
-        damage = self.power - target.fighter.defense
+        if target.fighter:
+            #a simple formula for attack damage
+            damage = self.power - target.fighter.defense
 
-        if damage > 0:
-            #make the target take some damage
-            print(f'{self.owner.name.capitalize()} attacks {target.name} for {str(damage)} hit points.')
-            target.fighter.take_damage(damage)
-        else:
-            print(f'{self.owner.name.capitalize()} attacks {target.name} but it has no effect!')
+            if damage > 0:
+                #make the target take some damage
+                print(f'{self.owner.name.capitalize()} attacks {target.name} for {str(damage)} hit points.')
+                target.fighter.take_damage(damage)
+            else:
+                print(f'{self.owner.name.capitalize()} attacks {target.name} but it has no effect!')
 
 class SelfMovingBasicMonster(BasicAI):
     #AI for a self-moving basic monster.
@@ -105,6 +133,7 @@ class Creature(CommonObject):
         self.color = color
         self.blocks = blocks
         self.target = False
+        self.is_alive = True
 
         self.fighter = fighter
         if self.fighter:  #let the fighter component know who owns it
@@ -165,27 +194,29 @@ class Orc(Creature, SelfMovingObject):
         return f'I am the fast {self.name}!!! ]:->'
 
     def move(self, path_blocked):
-        x = self.x + libtcodpy.random_get_int(0, -2, 2)
-        y = self.y + libtcodpy.random_get_int(0, -2, 2)
+        if self.is_alive:
+            x = self.x + libtcodpy.random_get_int(0, -2, 2)
+            y = self.y + libtcodpy.random_get_int(0, -2, 2)
 
-        if not path_blocked(x, y):
-            self.x = x
-            self.y = y
+            if not path_blocked(x, y):
+                self.x = x
+                self.y = y
 
     def move_towards(self, target_x, target_y, path_blocked):
-        #vector from this object to the target, and distance
-        dx = target_x - self.x
-        dy = target_y - self.y
-        distance = math.sqrt(dx ** 2 + dy ** 2)
+        if self.is_alive:
+            #vector from this object to the target, and distance
+            dx = target_x - self.x
+            dy = target_y - self.y
+            distance = math.sqrt(dx ** 2 + dy ** 2)
 
-        #normalize it to length 1 (preserving direction), then round it and
-        #convert to integer so the movement is restricted to the map grid
-        dx = int(round(dx / distance))
-        dy = int(round(dy / distance))
+            #normalize it to length 1 (preserving direction), then round it and
+            #convert to integer so the movement is restricted to the map grid
+            dx = int(round(dx / distance))
+            dy = int(round(dy / distance))
 
-        if not path_blocked(self.x + dx, self.y + dy):
-            self.x += dx
-            self.y += dy
+            if not path_blocked(self.x + dx, self.y + dy):
+                self.x += dx
+                self.y += dy
 
 class Troll(Creature):
     def __init__(self, name, con, x, y, char, blocks=True, fighter=None, ai=None):
@@ -206,16 +237,17 @@ class Player(Creature, MovingObject):
 
     def move(self, dx, dy, path_blocked):
         fov_recompute = False
-        is_blocked, obj = path_blocked(self.x + dx, self.y + dy)
-        
-        #attack if target found, move otherwise
-        if obj is not None and obj.target:
-            #print(f'The monster {obj.name} laughs at your puny efforts to attack him!')
-            self.fighter.attack(obj)
-        elif not is_blocked:
-            self.x += dx
-            self.y += dy
-  
-            fov_recompute = True
+
+        if self.is_alive:
+            is_blocked, obj = path_blocked(self.x + dx, self.y + dy)
+
+            #attack if target found, move otherwise
+            if obj is not None and obj.target:
+                #print(f'The monster {obj.name} laughs at your puny efforts to attack him!')
+                self.fighter.attack(obj)
+            elif not is_blocked:
+                self.x += dx
+                self.y += dy
+                fov_recompute = True
 
         return fov_recompute
